@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hair.management.dao.UserConsumerInfoMapper">
+    <select id="getUserConsumerInfoByUserId" resultType="com.hair.management.bean.response.UserConsumerDTO">
+        select uci.*,vu.user_name as vipUserName,hm.hair_master_name
+        from user_consumer_info uci left join vip_user vu  on uci.vip_user_id=vu.user_id
+            left join hair_master hm on uci.hair_master_id = hm.hair_master_id
+        where vip_user_id = #{userId}
+    </select>
+</mapper>
