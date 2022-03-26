@@ -1,6 +1,7 @@
 package com.hair.management.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hair.management.bean.enumerate.SexEnum;
 import com.hair.management.bean.param.SaveOrUpdateUserParam;
@@ -16,6 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hair.management.util.PageHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -38,7 +40,7 @@ import java.util.Optional;
 public class VipUserServiceImpl extends ServiceImpl<VipUserMapper, VipUser> implements VipUserService {
     @Resource
     private HairMasterService hairMasterService;
-    @Resource
+    @Autowired
     private VipAccountInfoService vipAccountInfoService;
 
     @Override
@@ -48,11 +50,10 @@ public class VipUserServiceImpl extends ServiceImpl<VipUserMapper, VipUser> impl
             Optional.ofNullable(hairMasterService.getById(param.getHairMasterId())).orElseThrow(() -> new RuntimeException("不存在的发艺师"));
         }
         Boolean telRegistered=this.isTelNumRegistered(param.getTelephone());
-
         if (Objects.nonNull(param.getUserId())){
             VipUser vipUser = this.getById(param.getUserId());
             Assert.notNull(vipUser,"会员用户不存在");
-            if (!StringUtils.equals(param.getTelephone(),vipUser.getTelephone())){
+            if (telRegistered&&!StringUtils.equals(param.getTelephone(),vipUser.getTelephone())){
                 throw new  RuntimeException(String.format("电话号码：%s已经被注册了！",param.getTelephone()));
             }
             vipUser.setUserName(param.getUserName());
@@ -88,6 +89,7 @@ public class VipUserServiceImpl extends ServiceImpl<VipUserMapper, VipUser> impl
     public UserListResp<VipUserListDTO> listVipUserList(VipUserQueryParam param) {
         //构建分页参数
         Page page=new Page<>(param.getPage().getCurrent(),param.getPage().getSize());
+        page.addOrder(OrderItem.asc("create_time"));
         IPage<VipUserListDTO> iPage = this.baseMapper.listVipUserList(page, param);
         UserListResp<VipUserListDTO> result=new UserListResp<VipUserListDTO>();
         result.setPage(PageHelper.setResponsePage(iPage));
@@ -95,10 +97,6 @@ public class VipUserServiceImpl extends ServiceImpl<VipUserMapper, VipUser> impl
             result.setData(Collections.emptyList());
             return result;
         }
-        iPage.getRecords().forEach(i->{
-            //处理一下性别
-            i.setSex(SexEnum.getDisplayNameByOrdinal(Integer.valueOf(i.getSex())));
-        });
         result.setData(iPage.getRecords());
         return result;
     }

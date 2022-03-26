@@ -10,6 +10,6 @@ public class MysqlGeneratorTest {
         MysqlGenerator mysqlGenerator = new MysqlGenerator();
         mysqlGenerator.setXml(true);
 //        mysqlGenerator.setController(true);
-        mysqlGenerator.generator("hair", "vip_user","vip_account_info","hair_master","user_consumer_info");
+        mysqlGenerator.generator("hair", "hair_master");
     }
 }

@@ -1,7 +1,7 @@
 package com.hair.management.dao;
 
-import com.hair.management.dao.entity.HairMaster;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.hair.management.dao.entity.HairMaster;
 
 /**
  * <p>

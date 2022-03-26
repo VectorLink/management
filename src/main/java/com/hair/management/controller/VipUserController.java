@@ -13,6 +13,7 @@ import com.hair.management.service.VipAccountInfoService;
 import com.hair.management.service.VipUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 
 
 @RequestMapping(value = "vipUser", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -60,6 +62,7 @@ public class VipUserController {
     @RequestMapping(path = "changeAccount",method = RequestMethod.POST)
     public ApiResult<String> changeAccountByUserId(@RequestBody ChargeAccountParam param){
         Assert.isTrue(ObjectUtils.allNotNull(param,param.getAlterAmount(),param.getConsumerType(),param.getUserId()),"充值或消费时，参数不能为空");
+        Assert.isTrue(param.getAlterAmount().compareTo(BigDecimal.ZERO)>0,"请输入大于1的金额");
         return ApiResult.success(vipAccountInfoService.changeAccountByUserId(param));
     }
 

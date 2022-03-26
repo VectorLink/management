@@ -1,17 +1,21 @@
 package com.hair.management.service.impl;
 
 import com.hair.management.bean.enumerate.ConsumerType;
+import com.hair.management.bean.enumerate.HairMasterType;
 import com.hair.management.bean.enumerate.NoticeUserType;
 import com.hair.management.bean.param.ChargeAccountParam;
+import com.hair.management.dao.entity.HairMaster;
 import com.hair.management.dao.entity.UserConsumerInfo;
 import com.hair.management.dao.entity.VipAccountInfo;
 import com.hair.management.dao.VipAccountInfoMapper;
 import com.hair.management.dao.entity.VipUser;
+import com.hair.management.service.HairMasterService;
 import com.hair.management.service.UserConsumerInfoService;
 import com.hair.management.service.VipAccountInfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hair.management.service.VipUserService;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -34,7 +38,10 @@ public class VipAccountInfoServiceImpl extends ServiceImpl<VipAccountInfoMapper,
     @Resource
     private UserConsumerInfoService userConsumerInfoService;
     @Resource
+    @Lazy
     private VipUserService vipUserService;
+    @Resource
+    private HairMasterService hairMasterService;
 
     @Override
     public Boolean addVipAccountInfo(Long vipUserId) {
@@ -56,9 +63,9 @@ public class VipAccountInfoServiceImpl extends ServiceImpl<VipAccountInfoMapper,
         VipUser vipUser=vipUserService.getById(param.getUserId());
         Assert.notNull(vipUser,"会员信息不存在");
 
-        BigDecimal changeAmount=BigDecimal.valueOf(Double.parseDouble(param.getAlterAmount()));
+        BigDecimal changeAmount=param.getAlterAmount();
         //todo 这个要换成 cookie里面获取对应的发艺师ID
-        Long haiMasterId=0L;
+        Long haiMasterId=hairMasterService.getCurrentHairMaster().getHairMasterId();
         //消费金额
         BigDecimal afterAmount;
         //构建结果消息
@@ -92,6 +99,11 @@ public class VipAccountInfoServiceImpl extends ServiceImpl<VipAccountInfoMapper,
             accountInfo.setAccountAmount(afterAmount);
 
         }else if (param.getConsumerType().equals(ConsumerType.charge)){
+            //验证权限
+            HairMaster currentHairMaster = hairMasterService.getCurrentHairMaster();
+            if (!currentHairMaster.getType().equals(HairMasterType.ADMIN.ordinal())){
+                throw new RuntimeException("您不是管理员，无权进行账户充值");
+            }
             afterAmount=accountInfo.getAccountAmount().add(changeAmount);
              userConsumerInfo=UserConsumerInfo.builder()
                     .consumerAmount(changeAmount)

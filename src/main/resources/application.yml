@@ -7,3 +7,6 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
 main:
   allow-bean-definition-overriding: true
+jwt:
+  secret: 096c1239e0e1f3b654574f948347b762
+  expire: 604800

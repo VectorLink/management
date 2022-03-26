@@ -1,6 +1,7 @@
 package com.hair.management.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hair.management.bean.Constants;
 import com.hair.management.bean.enumerate.ConsumerType;
@@ -32,6 +33,7 @@ public class UserConsumerInfoServiceImpl extends ServiceImpl<UserConsumerInfoMap
     @Override
     public UserListResp<UserConsumerDTO> getUserConsumerInfoByUserId(UserConsumerParam param) {
         Page page=new Page(param.getPage().getCurrent(),param.getPage().getSize());
+        page.addOrder(OrderItem.desc("uci.consumer_time"));
         IPage<UserConsumerDTO> userConsumerInfo = this.baseMapper.getUserConsumerInfoByUserId(page, param.getUserId());
         UserListResp<UserConsumerDTO> result=new UserListResp<>();
         result.setPage(PageHelper.setResponsePage(userConsumerInfo));
