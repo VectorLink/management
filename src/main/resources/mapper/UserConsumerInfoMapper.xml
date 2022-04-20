@@ -7,4 +7,11 @@
             left join hair_master hm on uci.hair_master_id = hm.hair_master_id
         where vip_user_id = #{userId}
     </select>
+
+    <select id="getMasterBillByMasterId" resultType="com.hair.management.bean.response.UserConsumerDTO">
+        select uci.*,vu.user_name as vipUserName,hm.hair_master_name
+        from user_consumer_info uci left join vip_user vu  on uci.vip_user_id=vu.user_id
+                                    left join hair_master hm on uci.hair_master_id = hm.hair_master_id
+        where hm.hair_master_id = #{hairMasterId}
+    </select>
 </mapper>

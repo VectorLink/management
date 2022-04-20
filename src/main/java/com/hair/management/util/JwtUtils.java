@@ -11,17 +11,17 @@ import org.springframework.context.annotation.Configuration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Data
-@ConfigurationProperties(prefix = "jwt")
-@Configuration
 public class JwtUtils {
-    private String secret;
-    private long expire;
+    private static final String secret="secret_hair";
+    private static final long expire=604800;
 
 
-    public String generateToken(Long hairMasterId) {
+    public static String generateToken(Long hairMasterId) {
         //过期时间
         LocalDateTime expireDate = LocalDateTime.now().plusSeconds(expire);
         return Jwts.builder().setHeaderParam("typ", "JWT")
@@ -33,7 +33,7 @@ public class JwtUtils {
                 .compact();
     }
 
-    public Claims getClaimByToken(String token) {
+    public static Claims getClaimByToken(String token) {
         try {
             return Jwts.parser().setSigningKey(secret)
                     .parseClaimsJws(token)
@@ -49,7 +49,7 @@ public class JwtUtils {
      * @param localDateTime
      * @return
      */
-    public Boolean isTokenExpired(LocalDateTime localDateTime){
+    public static Boolean isTokenExpired(LocalDateTime localDateTime){
             return localDateTime.isBefore(LocalDateTime.now());
     }
 }

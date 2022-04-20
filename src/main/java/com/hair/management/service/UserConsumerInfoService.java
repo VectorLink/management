@@ -2,12 +2,17 @@ package com.hair.management.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hair.management.bean.param.StatisticParam;
 import com.hair.management.bean.param.UserConsumerParam;
+import com.hair.management.bean.response.AllUserStatisticDto;
 import com.hair.management.bean.response.UserConsumerDTO;
 import com.hair.management.bean.response.UserListResp;
+import com.hair.management.bean.response.UserStatisticDTO;
 import com.hair.management.dao.entity.UserConsumerInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -24,4 +29,13 @@ public interface UserConsumerInfoService extends IService<UserConsumerInfo> {
      */
     UserListResp<UserConsumerDTO> getUserConsumerInfoByUserId(UserConsumerParam param);
 
+    UserListResp<UserConsumerDTO> getMasterBillByMasterId(UserConsumerParam param);
+
+    /**
+     * 获取当前日期的消费数据
+     * @return
+     */
+    UserStatisticDTO getHairMasterStatistic(StatisticParam param);
+
+    List<AllUserStatisticDto> getAllStatistic(StatisticParam param);
 }

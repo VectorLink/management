@@ -29,4 +29,11 @@ public interface VipAccountInfoService extends IService<VipAccountInfo> {
      */
     @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
     String changeAccountByUserId(ChargeAccountParam param);
+
+    /**
+     * 非会员入账
+     * @param param
+     * @return
+     */
+    String addNotVipBill(ChargeAccountParam param);
 }

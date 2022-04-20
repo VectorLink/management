@@ -40,7 +40,7 @@ public class UserConsumerInfo implements Serializable {
     private Integer consumerType;
 
     /**
-     * 会员名
+     * 会员名 0-非会员
      */
     private Long vipUserId;
 
@@ -75,5 +75,5 @@ public class UserConsumerInfo implements Serializable {
     /**
      * 发艺师ID
      */
-    private Long hair_master_id;
+    private Long hairMasterId;
 }

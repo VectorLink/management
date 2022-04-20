@@ -10,13 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class VipUserQueryParam {
     /**
-     * 用户名
+     * 用户名或者电话号码
      */
-    private String userName;
-    /**
-     * 电话号码
-     */
-    private String telephone;
+    private String searchParam;
     /**
      * 分页参数
      */

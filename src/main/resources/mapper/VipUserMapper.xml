@@ -14,12 +14,12 @@
                      left join vip_account_info vai on vu.user_id = vai.user_id
                      left join hair_master hm on hm.hair_master_id = vu.hair_master_id
         <where>
-            <trim prefixOverrides="and" suffixOverrides="and">
-                <if test="param.userName!=null and param.userName!=''">
-                    and vu.user_name like concat(#{param.userName},'%')
+            <trim prefixOverrides="or" suffixOverrides="or">
+                <if test="param.searchParam!=null and param.searchParam!=''">
+                    or vu.user_name like concat(#{param.searchParam},'%')
                 </if>
-                <if test="param.telephone!=null and param.telephone!=''">
-                    and vu.telephone=#{param.telephone}
+                <if test="param.searchParam!=null and param.searchParam!=''">
+                    or vu.telephone like concat(#{param.searchParam},'%')
                 </if>
             </trim>
         </where>

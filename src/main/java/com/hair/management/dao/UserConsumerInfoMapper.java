@@ -23,4 +23,12 @@ public interface UserConsumerInfoMapper extends BaseMapper<UserConsumerInfo> {
      * @return
      */
     IPage<UserConsumerDTO> getUserConsumerInfoByUserId(Page page,@Param("userId") Long userId);
+
+    /**
+     * 分页查询 发型师账目
+     * @param page
+     * @param hairMasterId
+     * @return
+     */
+    IPage<UserConsumerDTO> getMasterBillByMasterId(Page page,@Param("hairMasterId") Long hairMasterId);
 }

@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class HairMasterParam {
-    private String hairMasterCode;
-    private String hairMasterName;
+    private String searchParam;
     private Page page;
 }

@@ -1,7 +1,8 @@
 package com.hair.management.bean.enumerate;
 
 public enum NoticeUserType {
-    MESSAGE("短信");
+    MESSAGE("短信"),
+    NO_VIP_NOT_NOTICE("非会员不通知");
     private String displayName;
 
     NoticeUserType(String displayName) {

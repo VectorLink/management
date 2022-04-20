@@ -14,7 +14,6 @@ import com.hair.management.service.UserConsumerInfoService;
 import com.hair.management.service.VipAccountInfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hair.management.service.VipUserService;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -64,7 +63,6 @@ public class VipAccountInfoServiceImpl extends ServiceImpl<VipAccountInfoMapper,
         Assert.notNull(vipUser,"会员信息不存在");
 
         BigDecimal changeAmount=param.getAlterAmount();
-        //todo 这个要换成 cookie里面获取对应的发艺师ID
         Long haiMasterId=hairMasterService.getCurrentHairMaster().getHairMasterId();
         //消费金额
         BigDecimal afterAmount;
@@ -85,25 +83,20 @@ public class VipAccountInfoServiceImpl extends ServiceImpl<VipAccountInfoMapper,
                     .afterAccountAmount(afterAmount)
                     .consumerTime(LocalDateTime.now())
                     .consumerType(param.getConsumerType().ordinal())
-                    .hair_master_id(haiMasterId)
+                    .hairMasterId(haiMasterId)
                     .noticeUser(Boolean.FALSE)
                     .noticeUserType(NoticeUserType.MESSAGE.ordinal())
                     .vipUserId(param.getUserId())
                     .build();
             //构建成功消息
-            result= String.format("会员：【%s】消费成功，本次消费金额：%f,消费前账户金额：%f,消费后账户金额：%f", vipUser.getUserName(),
-                    changeAmount.setScale(2, RoundingMode.HALF_UP),
-                    accountInfo.getAccountAmount().setScale(2, RoundingMode.HALF_UP),
-                    afterAmount.setScale(2, RoundingMode.HALF_UP));
+            result= String.format("会员：【%s】消费成功，本次消费金额：%s,消费前账户金额：%s,消费后账户金额：%s", vipUser.getUserName(),
+                    changeAmount.setScale(2, RoundingMode.HALF_UP).toPlainString(),
+                    accountInfo.getAccountAmount().setScale(2, RoundingMode.HALF_UP).toPlainString(),
+                    afterAmount.setScale(2, RoundingMode.HALF_UP).toPlainString());
             accountInfo.setUpdateTime(LocalDateTime.now());
             accountInfo.setAccountAmount(afterAmount);
 
         }else if (param.getConsumerType().equals(ConsumerType.charge)){
-            //验证权限
-            HairMaster currentHairMaster = hairMasterService.getCurrentHairMaster();
-            if (!currentHairMaster.getType().equals(HairMasterType.ADMIN.ordinal())){
-                throw new RuntimeException("您不是管理员，无权进行账户充值");
-            }
             afterAmount=accountInfo.getAccountAmount().add(changeAmount);
              userConsumerInfo=UserConsumerInfo.builder()
                     .consumerAmount(changeAmount)
@@ -111,15 +104,15 @@ public class VipAccountInfoServiceImpl extends ServiceImpl<VipAccountInfoMapper,
                     .afterAccountAmount(afterAmount)
                     .consumerTime(LocalDateTime.now())
                     .consumerType(param.getConsumerType().ordinal())
-                    .hair_master_id(haiMasterId)
+                    .hairMasterId(haiMasterId)
                     .noticeUser(Boolean.FALSE)
                     .noticeUserType(NoticeUserType.MESSAGE.ordinal())
                     .vipUserId(param.getUserId())
                     .build();
-            result= String.format("会员：【%s】充值成功，本次充值：%f,消费前账户金额：%f,消费后账户金额：%f", vipUser.getUserName(),
-                    changeAmount.setScale(2, RoundingMode.HALF_UP),
-                    accountInfo.getAccountAmount().setScale(2, RoundingMode.HALF_UP),
-                    afterAmount.setScale(2, RoundingMode.HALF_UP));
+            result= String.format("会员：【%s】充值成功，本次充值：%s,消费前账户金额：%s,消费后账户金额：%s", vipUser.getUserName(),
+                    changeAmount.setScale(2, RoundingMode.HALF_UP).toPlainString(),
+                    accountInfo.getAccountAmount().setScale(2, RoundingMode.HALF_UP).toPlainString(),
+                    afterAmount.setScale(2, RoundingMode.HALF_UP).toPlainString());
             accountInfo.setUpdateTime(LocalDateTime.now());
             accountInfo.setAccountAmount(afterAmount);
         }
@@ -129,5 +122,24 @@ public class VipAccountInfoServiceImpl extends ServiceImpl<VipAccountInfoMapper,
         }
         //todo 这里消费完成后，异步调用接口发送短信消息到会员手机里面(需要等事务提交后再发送）
         return result;
+    }
+
+    @Override
+    public String addNotVipBill(ChargeAccountParam param) {
+        //当前用户
+        HairMaster currentHairMaster = hairMasterService.getCurrentHairMaster();
+        UserConsumerInfo userConsumerInfo= UserConsumerInfo.builder()
+                .vipUserId(0L)
+                .noticeUserType(NoticeUserType.NO_VIP_NOT_NOTICE.ordinal())
+                .consumerAmount(param.getAlterAmount())
+                .noticeUser(Boolean.TRUE)
+                .hairMasterId(currentHairMaster.getHairMasterId())
+                .consumerType(ConsumerType.normal_consumer.ordinal())
+                .preAccountAmount(BigDecimal.ZERO)
+                .afterAccountAmount(BigDecimal.ZERO)
+                .consumerTime(LocalDateTime.now())
+                .build();
+        this.userConsumerInfoService.saveOrUpdate(userConsumerInfo);
+        return String.format("%S操作成功，非会员消费金额：%s",currentHairMaster.getHairMasterName(),param.getAlterAmount().setScale(2,RoundingMode.HALF_UP).toPlainString());
     }
 }

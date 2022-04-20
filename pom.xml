@@ -86,9 +86,9 @@
 			<version>1.9.6</version>
 		</dependency>
 		<dependency>
-			<groupId>org.crazycake</groupId>
-			<artifactId>shiro-redis-spring-boot-starter</artifactId>
-			<version>3.2.1</version>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-spring</artifactId>
+			<version>1.4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.hutool</groupId>

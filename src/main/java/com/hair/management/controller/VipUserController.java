@@ -58,12 +58,27 @@ public class VipUserController {
         Assert.isTrue(ObjectUtils.allNotNull(param, param.getUserId()), "用户ID不能为空");
         return ApiResult.success(userConsumerInfoService.getUserConsumerInfoByUserId(param));
     }
+
+    @ApiOperation("分页查询发型师账目")
+    @RequestMapping(path = "listMasterBill", method = RequestMethod.POST)
+    public ApiResult<UserListResp<UserConsumerDTO>> listMasterBill(@RequestBody UserConsumerParam param) {
+        Assert.isTrue(ObjectUtils.allNotNull(param, param.getUserId()), "用户ID不能为空");
+        return ApiResult.success(userConsumerInfoService.getMasterBillByMasterId(param));
+    }
+
     @ApiOperation("会员充值或消费")
     @RequestMapping(path = "changeAccount",method = RequestMethod.POST)
     public ApiResult<String> changeAccountByUserId(@RequestBody ChargeAccountParam param){
         Assert.isTrue(ObjectUtils.allNotNull(param,param.getAlterAmount(),param.getConsumerType(),param.getUserId()),"充值或消费时，参数不能为空");
-        Assert.isTrue(param.getAlterAmount().compareTo(BigDecimal.ZERO)>0,"请输入大于1的金额");
+        Assert.isTrue(param.getAlterAmount().compareTo(BigDecimal.ZERO)>0,"请输入大于0的金额");
         return ApiResult.success(vipAccountInfoService.changeAccountByUserId(param));
     }
+    @ApiOperation("非会员入账")
+    @RequestMapping(path = "addBill",method = RequestMethod.POST)
+    public ApiResult<String> addNotVipUserBill(@RequestBody ChargeAccountParam param){
+        Assert.isTrue(param.getAlterAmount().compareTo(BigDecimal.ZERO)>0,"请输入大于0的金额");
+        return ApiResult.success(vipAccountInfoService.addNotVipBill(param));
+    }
+
 
 }
