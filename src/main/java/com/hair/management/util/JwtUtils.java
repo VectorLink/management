@@ -1,18 +1,16 @@
 package com.hair.management.util;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.hair.management.bean.Constants;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Data
@@ -24,32 +22,31 @@ public class JwtUtils {
     public static String generateToken(Long hairMasterId) {
         //过期时间
         LocalDateTime expireDate = LocalDateTime.now().plusSeconds(expire);
-        return Jwts.builder().setHeaderParam("typ", "JWT")
-                .setSubject(hairMasterId.toString())
-                .setIssuedAt(Date.from(LocalDateTime.now()
-                        .atZone(ZoneId.systemDefault()).toInstant()))
-                .setExpiration(Date.from(expireDate.atZone(ZoneId.systemDefault()).toInstant()))
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
+        return JWT.create().withClaim(Constants.CLAIM_TOKEN,hairMasterId)
+                .withExpiresAt(Date.from(expireDate.atZone(ZoneId.systemDefault()).toInstant()))
+                .sign(Algorithm.HMAC256(secret));
     }
 
-    public static Claims getClaimByToken(String token) {
+    public static Long getHairMasterIdByToken(String token) {
         try {
-            return Jwts.parser().setSigningKey(secret)
-                    .parseClaimsJws(token)
-                    .getBody();
+            DecodedJWT decode = JWT.decode(token);
+            return decode.getClaim(Constants.CLAIM_TOKEN).asLong();
         } catch (Exception e) {
             log.error("invalid token {}", token, e);
             return null;
         }
     }
 
-    /**
-     * 是否过期
-     * @param localDateTime
-     * @return
-     */
-    public static Boolean isTokenExpired(LocalDateTime localDateTime){
-            return localDateTime.isBefore(LocalDateTime.now());
+    public static Boolean verify(String token){
+        try {
+            Algorithm algorithm=Algorithm.HMAC256(secret);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withClaim(Constants.CLAIM_TOKEN, getHairMasterIdByToken(token)).build();
+            verifier.verify(token);
+            return true;
+        } catch (Exception e) {
+            log.info("错误：",e);
+            return false;
+        }
     }
 }

@@ -12,9 +12,11 @@ import com.hair.management.dao.entity.HairMaster;
 import com.hair.management.dao.HairMasterMapper;
 import com.hair.management.service.HairMasterService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hair.management.util.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -41,13 +43,13 @@ import java.util.stream.Collectors;
 public class HairMasterServiceImpl extends ServiceImpl<HairMasterMapper, HairMaster> implements HairMasterService {
     @Override
     public HairMaster getByCode(String code) {
-        return this.lambdaQuery().eq(HairMaster::getHairMasterCode,code).one();
+        return this.lambdaQuery().eq(HairMaster::getHairMasterCode,code).eq(HairMaster::getStatus,1).one();
     }
 
     @Override
     public HairMaster getCurrentHairMaster() {
-        HairMasterProfile hairMasterProfile = (HairMasterProfile) SecurityUtils.getSubject().getPrincipal();
-        HairMaster byId = this.getById(hairMasterProfile.getHairMasterId());
+        Long hairMasterId = JwtUtils.getHairMasterIdByToken(SecurityUtils.getSubject().getPrincipal().toString());
+        HairMaster byId = this.getById(hairMasterId);
         Assert.notNull(byId, "不存在的发型师");
         return byId;
     }

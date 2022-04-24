@@ -1,16 +1,12 @@
 package com.hair.management.bean.shiro;
 
-import cn.hutool.json.JSONUtil;
 import com.hair.management.bean.Constants;
-import com.hair.management.bean.response.ApiResult;
-import com.hair.management.util.JwtUtils;
-import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.ExpiredCredentialsException;
-import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,48 +15,36 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Objects;
 
 
 @Slf4j
-public class JwtFilter extends AuthenticatingFilter {
-    @Override
-    protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
-        String jwtToken = request.getHeader(Constants.AUTHORIZATION);
-        if (StringUtils.isEmpty(jwtToken)){
-            return null;
-        }
-        return new JwtToken(jwtToken);
-    }
+public class JwtFilter extends BasicHttpAuthenticationFilter {
 
     @Override
-    protected boolean onAccessDenied(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
-        HttpServletRequest request = WebUtils.toHttp(servletRequest);
-        String jwtToken = request.getHeader(Constants.AUTHORIZATION);
-        if (StringUtils.isEmpty(jwtToken)){
-            return true ;
-        }
-        Claims claimByToken = JwtUtils.getClaimByToken(jwtToken);
-        if (Objects.isNull(claimByToken)||JwtUtils.isTokenExpired(LocalDateTime.ofInstant(claimByToken.getExpiration().toInstant(), ZoneId.systemDefault()))){
-            throw new ExpiredCredentialsException("token 失效，请重新登录");
-        }
-        return executeLogin(servletRequest,servletResponse);
-    }
-
-    @Override
-    protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request, ServletResponse response) {
-        ApiResult<Object> error = ApiResult.error(e.getMessage());
+    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         try {
-            response.getWriter().print(JSONUtil.toJsonStr(error));
-        } catch (IOException ex) {
-           log.error("登录异常：",ex);
+          return  executeLogin(request,response);
+        } catch (Exception e) {
+           return false;
         }
-        return false;
+    }
 
+    @Override
+    protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
+        HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
+        String jwtToken = httpServletRequest.getHeader(Constants.AUTHORIZATION);
+        if (StringUtils.isEmpty(jwtToken)){
+            return false;
+        }
+        JwtToken jwt = new JwtToken(jwtToken);
+        try {
+            getSubject(request,response).login(jwt);
+        } catch (AuthenticationException e) {
+            log.error("登录验证异常：",e);
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -77,4 +61,9 @@ public class JwtFilter extends AuthenticatingFilter {
         return super.onPreHandle(request, response, mappedValue);
     }
 
+    @Override
+    protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response) throws Exception {
+        log.info("登录成功：{}",token.toString());
+        return super.onLoginSuccess(token, subject, request, response);
+    }
 }

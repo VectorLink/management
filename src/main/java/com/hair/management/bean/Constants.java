@@ -11,4 +11,6 @@ public class Constants {
     public static final String AUTHORIZATION="authorization";
 
     public static final String MD5_KEY="HAIR_MANAGEMENT";
+
+    public static final String CLAIM_TOKEN="HAIR_MASTER_ID";
 }
