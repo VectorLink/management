@@ -25,4 +25,18 @@ public enum ConsumerType {
         }
         return normal_consumer.displayName;
     }
+    /**
+     * 获取消费类型
+     * @param ordinal
+     * @return
+     */
+    public static ConsumerType getByOrdinal(Integer ordinal){
+        for (ConsumerType value : ConsumerType.values()) {
+            if (ordinal.equals(value.ordinal())){
+                return value;
+            }
+        }
+        return null;
+    }
+
 }

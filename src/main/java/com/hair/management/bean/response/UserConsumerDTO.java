@@ -18,6 +18,10 @@ import java.time.LocalDateTime;
 public class UserConsumerDTO {
 
     /**
+     * 消费主键
+     */
+    private Long id;
+    /**
      * 消费类型
      */
     private String consumerType;
@@ -63,4 +67,8 @@ public class UserConsumerDTO {
      * 发艺师名称
      */
     private String hairMasterName;
+    /**
+     * 签名
+     */
+    private byte[] signImg;
 }

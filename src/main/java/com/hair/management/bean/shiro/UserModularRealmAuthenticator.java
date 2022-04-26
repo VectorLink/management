@@ -15,7 +15,6 @@ public class UserModularRealmAuthenticator extends ModularRealmAuthenticator {
 
     @Override
     protected AuthenticationInfo doAuthenticate(AuthenticationToken authenticationToken) throws AuthenticationException {
-        log.info("开始判断选择");
         assertRealmsConfigured();
         Collection<Realm> realms = getRealms();
         if (authenticationToken instanceof JwtToken) {

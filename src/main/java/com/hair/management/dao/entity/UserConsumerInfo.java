@@ -1,14 +1,14 @@
 package com.hair.management.dao.entity;
 
-import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -76,4 +76,8 @@ public class UserConsumerInfo implements Serializable {
      * 发艺师ID
      */
     private Long hairMasterId;
+    /**
+     * 签名图片
+     */
+    private byte[] signImg;
 }

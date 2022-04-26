@@ -5,6 +5,9 @@ import com.hair.management.dao.entity.VipAccountInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 /**
  * <p>
@@ -28,7 +31,7 @@ public interface VipAccountInfoService extends IService<VipAccountInfo> {
      * @return
      */
     @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
-    String changeAccountByUserId(ChargeAccountParam param);
+    String changeAccountByUserId(ChargeAccountParam param, MultipartFile signImg);
 
     /**
      * 非会员入账

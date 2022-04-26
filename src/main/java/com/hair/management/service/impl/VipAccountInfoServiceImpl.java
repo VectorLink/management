@@ -17,8 +17,10 @@ import com.hair.management.service.VipUserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -55,7 +57,7 @@ public class VipAccountInfoServiceImpl extends ServiceImpl<VipAccountInfoMapper,
     }
 
     @Override
-    public String changeAccountByUserId(ChargeAccountParam param) {
+    public String changeAccountByUserId(ChargeAccountParam param, MultipartFile signImg)  {
         //获取对应的账户信息
         VipAccountInfo accountInfo = this.lambdaQuery().eq(VipAccountInfo::getUserId, param.getUserId()).one();
         Assert.notNull(accountInfo,"无法找到该会员的账户信息");
@@ -70,24 +72,38 @@ public class VipAccountInfoServiceImpl extends ServiceImpl<VipAccountInfoMapper,
         String result="";
         //日志消息
         UserConsumerInfo userConsumerInfo=null;
-        if (param.getConsumerType().equals(ConsumerType.normal_consumer)){
+        ConsumerType consumerType = ConsumerType.getByOrdinal(param.getConsumerType());
+        if(consumerType ==null ){
+            throw new RuntimeException("消费类型无效");
+        }
+        if (consumerType.equals(ConsumerType.normal_consumer)){
+            //必须要有签名
+         //   Assert.notNull(param.getSign(),"签名不存在，请检查是否已签名");
             //验证一下金额是否够减
             if (accountInfo.getAccountAmount().compareTo(changeAmount)<0){
                 throw new RuntimeException("账户余额少于消费金额，请先充值后在进行消费");
             }
             afterAmount=accountInfo.getAccountAmount().subtract(changeAmount);
-            //构建消费日志， 记录消费日志
-             userConsumerInfo=UserConsumerInfo.builder()
-                    .consumerAmount(changeAmount)
-                    .preAccountAmount(accountInfo.getAccountAmount())
-                    .afterAccountAmount(afterAmount)
-                    .consumerTime(LocalDateTime.now())
-                    .consumerType(param.getConsumerType().ordinal())
-                    .hairMasterId(haiMasterId)
-                    .noticeUser(Boolean.FALSE)
-                    .noticeUserType(NoticeUserType.MESSAGE.ordinal())
-                    .vipUserId(param.getUserId())
-                    .build();
+            try {
+                byte[] imgBytes=signImg.getBytes();
+                //构建消费日志， 记录消费日志
+                userConsumerInfo = UserConsumerInfo.builder()
+                        .consumerAmount(changeAmount)
+                        .preAccountAmount(accountInfo.getAccountAmount())
+                        .afterAccountAmount(afterAmount)
+                        .consumerTime(LocalDateTime.now())
+                        .consumerType(param.getConsumerType())
+                        .hairMasterId(haiMasterId)
+                        .noticeUser(Boolean.FALSE)
+                        .noticeUserType(NoticeUserType.MESSAGE.ordinal())
+                        .vipUserId(param.getUserId())
+                        .signImg(imgBytes)
+                        .build();
+            } catch (IOException e) {
+                log.error("图片解码错误:",e);
+              throw new RuntimeException("图片解码错误");
+            }
+
             //构建成功消息
             result= String.format("会员：【%s】消费成功，本次消费金额：%s,消费前账户金额：%s,消费后账户金额：%s", vipUser.getUserName(),
                     changeAmount.setScale(2, RoundingMode.HALF_UP).toPlainString(),
@@ -96,14 +112,14 @@ public class VipAccountInfoServiceImpl extends ServiceImpl<VipAccountInfoMapper,
             accountInfo.setUpdateTime(LocalDateTime.now());
             accountInfo.setAccountAmount(afterAmount);
 
-        }else if (param.getConsumerType().equals(ConsumerType.charge)){
+        }else if (consumerType.equals(ConsumerType.charge)){
             afterAmount=accountInfo.getAccountAmount().add(changeAmount);
              userConsumerInfo=UserConsumerInfo.builder()
                     .consumerAmount(changeAmount)
                     .preAccountAmount(accountInfo.getAccountAmount())
                     .afterAccountAmount(afterAmount)
                     .consumerTime(LocalDateTime.now())
-                    .consumerType(param.getConsumerType().ordinal())
+                    .consumerType(param.getConsumerType())
                     .hairMasterId(haiMasterId)
                     .noticeUser(Boolean.FALSE)
                     .noticeUserType(NoticeUserType.MESSAGE.ordinal())

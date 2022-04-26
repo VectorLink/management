@@ -1,8 +1,8 @@
 package com.hair.management.config;
 
 
-import com.hair.management.bean.shiro.JwtRealm;
 import com.hair.management.bean.shiro.JwtFilter;
+import com.hair.management.bean.shiro.JwtRealm;
 import com.hair.management.bean.shiro.LoginRealm;
 import com.hair.management.bean.shiro.UserModularRealmAuthenticator;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.Resource;
 import javax.servlet.Filter;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -36,6 +35,7 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setUnauthorizedUrl("/error");
         Map<String, String> filterChainMap = new LinkedHashMap<>();
         filterChainMap.put("/swagger**/**", "anon");
+        filterChainMap.put("/vipUser/getConsumerImg","anon");
         filterChainMap.put("/webjars/**", "anon");
         filterChainMap.put("/v2/**", "anon");
         filterChainMap.put("/login","anon");
