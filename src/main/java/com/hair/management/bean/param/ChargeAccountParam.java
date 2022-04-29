@@ -18,9 +18,4 @@ public class ChargeAccountParam {
     Integer consumerType;
     BigDecimal alterAmount;
     Long userId;
-    /**
-     * 图片签名
-     */
-
-    MultipartFile sign;
 }

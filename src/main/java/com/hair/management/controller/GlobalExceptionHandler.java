@@ -7,18 +7,16 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-    @ExceptionHandler(value = RuntimeException.class)
-    public ApiResult<String> exceptionHandler(RuntimeException runtimeException) {
+    @ExceptionHandler(value = Exception.class)
+    @ResponseBody
+    public ApiResult<String> exceptionHandler(Exception runtimeException) {
         log.error("exception:", runtimeException);
         return ApiResult.error(runtimeException.getMessage());
-    }
-    @ExceptionHandler(value = UnauthorizedException.class)
-    public ApiResult<String> shiroExceptionHandler(UnauthorizedException shiroException){
-        return ApiResult.error(401,"未授权");
     }
 }

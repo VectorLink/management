@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hair.management.bean.enumerate.ChangeConsumerBillParam;
 import com.hair.management.bean.enumerate.ConsumerType;
 import com.hair.management.bean.enumerate.NoticeUserType;
 import com.hair.management.bean.param.StatisticParam;
@@ -22,6 +23,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hair.management.util.LocalDateTimeUtil;
 import com.hair.management.util.PageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -196,5 +198,15 @@ public class UserConsumerInfoServiceImpl extends ServiceImpl<UserConsumerInfoMap
             queryWrapper.ge(UserConsumerInfo::getConsumerTime,LocalDate.now().atStartOfDay());
         }
         return queryWrapper;
+    }
+
+    @Override
+    public void changeConsumerBill(ChangeConsumerBillParam param) {
+        UserConsumerInfo userConsumerInfo = this.getById(param.getConsumerId());
+        Assert.notNull(userConsumerInfo,"不存在该消费信息");
+        Assert.isTrue(userConsumerInfo.getVipUserId().equals(0L),"会员账目信息不支持修改");
+        Assert.isTrue(BigDecimal.ZERO.compareTo(param.getChangeAmount())<0,"请输入大于0的金额");
+        userConsumerInfo.setConsumerAmount(param.getChangeAmount());
+        this.saveOrUpdate(userConsumerInfo);
     }
 }

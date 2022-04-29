@@ -67,8 +67,4 @@ public class UserConsumerDTO {
      * 发艺师名称
      */
     private String hairMasterName;
-    /**
-     * 签名
-     */
-    private byte[] signImg;
 }

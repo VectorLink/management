@@ -5,5 +5,7 @@ spring:
       password: 123456
       url: jdbc:mysql://127.0.0.1:3306/hair?useSSL=false&&autoReconnect=true
       driver-class-name: com.mysql.cj.jdbc.Driver
+
 main:
   allow-bean-definition-overriding: true
+

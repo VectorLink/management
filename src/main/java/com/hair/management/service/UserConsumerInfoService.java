@@ -2,6 +2,7 @@ package com.hair.management.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hair.management.bean.enumerate.ChangeConsumerBillParam;
 import com.hair.management.bean.param.StatisticParam;
 import com.hair.management.bean.param.UserConsumerParam;
 import com.hair.management.bean.response.AllUserStatisticDto;
@@ -38,4 +39,11 @@ public interface UserConsumerInfoService extends IService<UserConsumerInfo> {
     UserStatisticDTO getHairMasterStatistic(StatisticParam param);
 
     List<AllUserStatisticDto> getAllStatistic(StatisticParam param);
+
+    /**
+     * 修改消费信息
+     * @param param
+     * @return
+     */
+    void changeConsumerBill(ChangeConsumerBillParam param);
 }

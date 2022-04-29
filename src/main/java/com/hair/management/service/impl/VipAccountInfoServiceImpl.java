@@ -78,7 +78,7 @@ public class VipAccountInfoServiceImpl extends ServiceImpl<VipAccountInfoMapper,
         }
         if (consumerType.equals(ConsumerType.normal_consumer)){
             //必须要有签名
-         //   Assert.notNull(param.getSign(),"签名不存在，请检查是否已签名");
+            Assert.notNull(signImg,"签名不存在，请检查是否已签名");
             //验证一下金额是否够减
             if (accountInfo.getAccountAmount().compareTo(changeAmount)<0){
                 throw new RuntimeException("账户余额少于消费金额，请先充值后在进行消费");
