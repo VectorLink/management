@@ -53,7 +53,10 @@ public class VipUserServiceImpl extends ServiceImpl<VipUserMapper, VipUser> impl
         if (Objects.nonNull(param.getHairMasterId())) {
             Optional.ofNullable(hairMasterService.getById(param.getHairMasterId())).orElseThrow(() -> new RuntimeException("不存在的发艺师"));
         }
-        Boolean telRegistered=this.isTelNumRegistered(param.getTelephone());
+        Boolean telRegistered =false;
+        if (StringUtils.isNotBlank(param.getTelephone())) {
+            telRegistered=this.isTelNumRegistered(param.getTelephone());
+        }
         if (Objects.nonNull(param.getUserId())){
             VipUser vipUser = this.getById(param.getUserId());
             Assert.notNull(vipUser,"会员用户不存在");

@@ -18,7 +18,6 @@
                 <if test="param.searchParam!=null and param.searchParam!=''">
                     or vu.user_name like concat(#{param.searchParam},'%')
                     or vu.telephone like concat(#{param.searchParam},'%')
-                    or vu.user_code like concat(#{param.searchParam},'%')
                 </if>
             </trim>
         </where>

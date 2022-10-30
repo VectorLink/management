@@ -48,8 +48,8 @@ public class VipUserController {
     @ApiOperation("添加会员或修改会员")
     @RequestMapping(path = "addUser", method = RequestMethod.POST)
     public ApiResult<Boolean> addVipUser(@RequestBody SaveOrUpdateUserParam param) {
-        Assert.isTrue(ObjectUtils.allNotNull(param, param.getUserName(), param.getTelephone(), param.getSex()),
-                "修改和新增会员时，用户名，性别，联系电话不能为空");
+        Assert.isTrue(ObjectUtils.allNotNull(param, param.getUserName(), param.getTelephone()),
+                "修改和新增会员时，用户名，联系电话不能都为空");
         return ApiResult.success(vipUserService.saveOrUpdateVipUser(param));
     }
 
