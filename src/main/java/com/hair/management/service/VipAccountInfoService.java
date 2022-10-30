@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -23,7 +24,7 @@ public interface VipAccountInfoService extends IService<VipAccountInfo> {
      * @param vipUserId 用户ID
      * @return 添加是否成功
      */
-    Boolean addVipAccountInfo(Long vipUserId);
+    Boolean addVipAccountInfo(Long vipUserId );
 
     /**
      * 更改账户 余额

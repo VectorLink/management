@@ -3,23 +3,22 @@
 <mapper namespace="com.hair.management.dao.VipUserMapper">
     <select id="listVipUserList" resultType="com.hair.management.bean.response.VipUserListDTO">
         select vu.user_id as 'vipUserId',
-               vu.user_name as 'vipUserName',
-               vu.sex,
-               vu.telephone,
-               hm.hair_master_id as 'hairMasterId',
-               hm.hair_master_name,
-               vu.create_time,
-               vai.account_amount
+        vu.user_name as 'vipUserName',
+        vu.sex,
+        vu.telephone,
+        hm.hair_master_id as 'hairMasterId',
+        hm.hair_master_name,
+        vu.create_time,
+        vai.account_amount
         from vip_user vu
-                     left join vip_account_info vai on vu.user_id = vai.user_id
-                     left join hair_master hm on hm.hair_master_id = vu.hair_master_id
+        left join vip_account_info vai on vu.user_id = vai.user_id
+        left join hair_master hm on hm.hair_master_id = vu.hair_master_id
         <where>
             <trim prefixOverrides="or" suffixOverrides="or">
                 <if test="param.searchParam!=null and param.searchParam!=''">
                     or vu.user_name like concat(#{param.searchParam},'%')
-                </if>
-                <if test="param.searchParam!=null and param.searchParam!=''">
                     or vu.telephone like concat(#{param.searchParam},'%')
+                    or vu.user_code like concat(#{param.searchParam},'%')
                 </if>
             </trim>
         </where>

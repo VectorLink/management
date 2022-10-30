@@ -3,7 +3,10 @@ package com.hair.management.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hair.management.bean.Constants;
+import com.hair.management.bean.enumerate.ConsumerType;
 import com.hair.management.bean.enumerate.SexEnum;
+import com.hair.management.bean.param.ChargeAccountParam;
 import com.hair.management.bean.param.SaveOrUpdateUserParam;
 import com.hair.management.bean.param.VipUserQueryParam;
 import com.hair.management.bean.response.VipUserListDTO;
@@ -23,6 +26,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Objects;
@@ -77,6 +81,16 @@ public class VipUserServiceImpl extends ServiceImpl<VipUserMapper, VipUser> impl
         if(!accountSuccess){
             throw new RuntimeException("账户添加失败");
         }
+        if (Objects.nonNull(param.getAccountAmount())&&param.getAccountAmount().compareTo(BigDecimal.ZERO)> Constants.NUMBER_ZERO) {
+            //账户创建成功后，充值金额
+            vipAccountInfoService.changeAccountByUserId(
+                    ChargeAccountParam.builder()
+                            .userId(vipUser.getUserId())
+                            .alterAmount(param.getAccountAmount())
+                            .consumerType(ConsumerType.charge.ordinal())
+                            .build(),
+                    null);
+        }
         return Boolean.TRUE;
     }
 
@@ -89,7 +103,7 @@ public class VipUserServiceImpl extends ServiceImpl<VipUserMapper, VipUser> impl
     public UserListResp<VipUserListDTO> listVipUserList(VipUserQueryParam param) {
         //构建分页参数
         Page page=new Page<>(param.getPage().getCurrent(),param.getPage().getSize());
-        page.addOrder(OrderItem.asc("create_time"));
+        page.addOrder(OrderItem.desc("vu.user_id"));
         IPage<VipUserListDTO> iPage = this.baseMapper.listVipUserList(page, param);
         UserListResp<VipUserListDTO> result=new UserListResp<VipUserListDTO>();
         result.setPage(PageHelper.setResponsePage(iPage));

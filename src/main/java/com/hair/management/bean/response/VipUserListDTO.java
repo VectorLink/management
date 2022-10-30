@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class VipUserListDTO {
     /**
-     * 会员ID
+     * 会员编号ID
      */
     public Long vipUserId;
     /**

@@ -45,7 +45,7 @@ public class VipUserController {
     @Resource
     private VipAccountInfoService vipAccountInfoService;
 
-    @ApiOperation("添加会员")
+    @ApiOperation("添加会员或修改会员")
     @RequestMapping(path = "addUser", method = RequestMethod.POST)
     public ApiResult<Boolean> addVipUser(@RequestBody SaveOrUpdateUserParam param) {
         Assert.isTrue(ObjectUtils.allNotNull(param, param.getUserName(), param.getTelephone(), param.getSex()),
