@@ -3,9 +3,10 @@ spring:
     druid:
       username: root
       password: 123456
-      url: jdbc:mysql://127.0.0.1:3306/hair?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai
+      url: jdbc:mysql://127.0.0.1:3306/hair?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai&autoConnect=true
       driver-class-name: com.mysql.cj.jdbc.Driver
 
 main:
   allow-bean-definition-overriding: true
-
+server:
+  port: 8080
